@@ -14,7 +14,7 @@ const useApp = () => useContext(AppContext);
 
 // Create a provider component
 const AppProvider = ({ children }) => {
-  const [playerInventory, setPlayerInventory] = useState(EMPTY_INVENTORY(4, 9));
+  const [playerInventory, setPlayerInventory] = useState(EMPTY_INVENTORY(1, 9));
   const [chestInventory, setChestInventory] = useState(EMPTY_INVENTORY(4, 9));
   const [craftingTableInventory, setCraftingTableInventory] = useState(
     EMPTY_INVENTORY(3, 3)
@@ -75,13 +75,13 @@ const AppProvider = ({ children }) => {
         const newInventory = [...prev];
         newInventory.forEach((slot, index) => {
           if (i >= itemArray.length) return;
-          if (newInventory[index].id === null) {
+          if (slot.id === null) {
             newInventory[index] = itemArray[i];
             i++;
           } else {
             const stackSize = maxStackSize(itemArray[i].id);
-            const spaceLeft = stackSize - newInventory[index].count;
-            if (newInventory[index].id === itemArray[i].id) {
+            const spaceLeft = stackSize - slot.count;
+            if (slot.id === itemArray[i].id) {
               if (spaceLeft >= itemArray[i].count) {
                 newInventory[index].count += itemArray[i].count;
                 i++;
@@ -110,6 +110,8 @@ const AppProvider = ({ children }) => {
         setMousePosition,
         isLeftDragging,
         setIsLeftDragging,
+        craftingTableInventory,
+        setCraftingTableInventory,
         playerInventory,
         setPlayerInventory,
         chestInventory,

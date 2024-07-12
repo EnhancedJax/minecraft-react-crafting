@@ -2,7 +2,7 @@ import { useApp } from "../../provider";
 import StackSizeNumber from "./containers/StackSizeNumber";
 import { useInventory } from "./provider";
 
-export default function Inventory() {
+export default function Inventory({ rows = 4, cols = 9 }) {
   const {
     type,
     inventory,
@@ -15,7 +15,13 @@ export default function Inventory() {
   const { items } = useApp();
 
   return (
-    <div className="relative grid grid-cols-9 grid-rows-4 p-4 bg-neutral-200">
+    <div
+      className="relative grid p-4 bg-neutral-200"
+      style={{
+        gridTemplateColumns: `repeat(${cols}, 1fr)`,
+        gridTemplateRows: `repeat(${rows}, 1fr)`,
+      }}
+    >
       {inventory.map(({ id, count }, slotIndex) => (
         <div
           key={slotIndex}

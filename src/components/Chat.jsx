@@ -3,8 +3,8 @@ import { useApp } from "../provider";
 import { useInventory } from "./Inventory/provider";
 
 export default function Chat() {
-  const { type, items } = useInventory();
-  const { insertInventoryItem } = useApp();
+  const { type } = useInventory();
+  const { items, insertInventoryItem } = useApp();
   const [inputValue, setInputValue] = useState("");
   const [error, setError] = useState(null);
 
