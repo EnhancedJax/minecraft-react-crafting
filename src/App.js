@@ -1,9 +1,6 @@
 import { useEffect } from "react";
-import Chat from "./components/Chat";
-import Inventory from "./components/Inventory";
-import { PLAYER_DEFAULT_INVENTORY } from "./components/Inventory/constants";
 import Pickup from "./components/Inventory/containers/Pickup";
-import { InventoryProvider } from "./components/Inventory/provider";
+import InventoryGroup from "./components/InventoryGroup";
 import { AppProvider } from "./provider";
 
 function App() {
@@ -13,21 +10,33 @@ function App() {
     });
   }, []);
   return (
-    <main className="flex-col w-screen h-screen overflow-hidden bg-neutral-600 flex-center">
+    <main className="flex w-screen h-screen overflow-hidden bg-neutral-600 flex-center">
+      {/* <img
+        src="inventory.png"
+        alt="background"
+        className="z-20"
+        style={{ height: 500 }}
+      /> */}
       <AppProvider>
-        <InventoryProvider type="craftingTable">
-          <Inventory rows="3" cols="3" />
-        </InventoryProvider>
-        <InventoryProvider type="chest">
-          <Inventory />
-        </InventoryProvider>
-        <InventoryProvider
-          type="player"
-          defaultInventory={PLAYER_DEFAULT_INVENTORY}
-        >
-          <Inventory rows="1" />
-          <Chat />
-        </InventoryProvider>
+        <div className="flex flex-col items-center gap-3 p-3 border-4 border-black rounded-xl bg-[#C6C6C6]">
+          <div className="flex justify-between w-full">
+            <div className="flex items-end h-full">
+              <InventoryGroup type="armor" />
+              <div className="mc-grid !h-[216px] !w-[150px] !bg-black"></div>
+              <div className="mc-grid "></div>
+            </div>
+            <div className="">
+              <span className="text-2xl text-neutral-700">Crafting</span>
+              <div className="flex items-center">
+                <InventoryGroup type="craftingTable" />
+                <span className="mx-2 text-3xl">-{">"}</span>
+                <div className="mc-grid "></div>
+              </div>
+            </div>
+          </div>
+          <InventoryGroup type="chest" chatTarget />
+          <InventoryGroup type="player" />
+        </div>
         <Pickup />
       </AppProvider>
     </main>

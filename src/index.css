@@ -28,6 +28,9 @@ img {
 }
 
 .mc-grid {
+  width: 54px;
+  height: 54px;
+  cursor: pointer;
   position: relative;
   display: inline-block;
   text-align: center !important;

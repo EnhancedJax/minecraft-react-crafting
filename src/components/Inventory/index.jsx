@@ -16,7 +16,7 @@ export default function Inventory({ rows = 4, cols = 9 }) {
 
   return (
     <div
-      className="relative grid p-4 bg-neutral-200"
+      className="relative grid"
       style={{
         gridTemplateColumns: `repeat(${cols}, 1fr)`,
         gridTemplateRows: `repeat(${rows}, 1fr)`,
@@ -25,7 +25,7 @@ export default function Inventory({ rows = 4, cols = 9 }) {
       {inventory.map(({ id, count }, slotIndex) => (
         <div
           key={slotIndex}
-          className={`mc-grid type-${type} relative w-[54px] h-[54px] cursor-pointer ${
+          className={`mc-grid type-${type} relative ${
             draggedSlots.includes(slotIndex) && id !== null && "opacity-50"
           }`} // position of class name mc-grid and type used for quick access. Don't change
           onMouseOver={() => handleMouseOver(slotIndex)}

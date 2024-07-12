@@ -23,11 +23,10 @@ const InventoryProvider = ({ type, children }) => {
     setMousePosition,
     setIsLeftDragging,
     clickReference,
+    setInventory,
     setClickReference,
   } = appContext;
-  const inventory = appContext[`${type}Inventory`];
-  const setInventory =
-    appContext[`set${type[0].toUpperCase()}${type.slice(1)}Inventory`];
+  const inventory = appContext.inventories[type];
   const [lastMouseDownSlotIndex, setLastMouseDownSlotIndex] =
     useState(undefined);
   const [checkDClickIndex, setCheckDClickIndex] = useState(undefined);
@@ -109,7 +108,7 @@ const InventoryProvider = ({ type, children }) => {
         newInventory[slot] = { id: newHeldItem.id, count: distributedCount };
       });
     }
-    setInventory(newInventory);
+    setInventory(type, newInventory);
     setHeldItem(newHeldItem);
     setDraggedSlots(newDraggedSlots);
   };
@@ -211,7 +210,7 @@ const InventoryProvider = ({ type, children }) => {
     }
     setCheckDClickIndex(newCheckDClickIndex);
     timeoutDClick();
-    setInventory(newInventory);
+    setInventory(type, newInventory);
     setHeldItem(newHeldItem);
   };
 

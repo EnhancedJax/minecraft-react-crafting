@@ -3,9 +3,11 @@ import React, {
   useCallback,
   useContext,
   useEffect,
+  useMemo,
   useState,
 } from "react";
 import { EMPTY_INVENTORY, EMPTY_ITEM } from "./components/Inventory/constants";
+import { INVENTORIES } from "./constants";
 import { getTextures, maxStackSize } from "./utils";
 
 // Create a new context
@@ -14,10 +16,23 @@ const useApp = () => useContext(AppContext);
 
 // Create a provider component
 const AppProvider = ({ children }) => {
-  const [playerInventory, setPlayerInventory] = useState(EMPTY_INVENTORY(1, 9));
-  const [chestInventory, setChestInventory] = useState(EMPTY_INVENTORY(4, 9));
-  const [craftingTableInventory, setCraftingTableInventory] = useState(
-    EMPTY_INVENTORY(3, 3)
+  const types = useMemo(() => Object.keys(INVENTORIES), []);
+  const [inventories, setInventories] = useState(
+    types.reduce((acc, type) => {
+      const thisInventory = INVENTORIES[type];
+      acc[type] = EMPTY_INVENTORY(thisInventory.rows, thisInventory.cols);
+      if (thisInventory?.defaultInventory) {
+        const defaultInventory = thisInventory.defaultInventory;
+        acc[type] = [
+          ...defaultInventory,
+          ...acc[type].slice(
+            0,
+            thisInventory.rows * thisInventory.cols - defaultInventory.length
+          ),
+        ];
+      }
+      return acc;
+    }, {})
   );
   const [items, setItems] = useState([]);
   const [heldItem, setHeldItem] = useState(EMPTY_ITEM);
@@ -25,32 +40,20 @@ const AppProvider = ({ children }) => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [clickReference, setClickReference] = useState(null);
 
-  const [types, setTypes] = useState([]);
+  function setInventory(type, callback) {
+    setInventories((prev) => {
+      const newInventories = { ...prev };
+      newInventories[type] =
+        typeof callback === "function" ? callback(prev[type]) : callback;
+      return newInventories;
+    });
+  }
 
   useEffect(() => {
     (async () => {
       const { items } = await getTextures();
       setItems(items);
     })();
-
-    const arrayOfChildren = Array.isArray(children) ? children : [children];
-    const newTypes = arrayOfChildren
-      .filter((child) => child.type.name === "InventoryProvider")
-      .map((child) => child.props.type);
-    arrayOfChildren
-      .filter(
-        (child) =>
-          child.type.name === "InventoryProvider" &&
-          child.props.defaultInventory
-      )
-      .forEach((child) => {
-        insertInventoryItem(
-          child.props.defaultInventory,
-          child.props.type,
-          newTypes
-        );
-      });
-    setTypes(newTypes);
 
     const handleMouseMove = (e) => {
       setMousePosition({ x: e.clientX, y: e.clientY });
@@ -62,16 +65,12 @@ const AppProvider = ({ children }) => {
   }, [children]);
 
   const insertInventoryItem = useCallback(
-    (itemArray, targetType, syncTypes) => {
+    (itemArray, targetType) => {
       if (!itemArray || !targetType) return console.error("Missing arguments");
-      const targetTypes = syncTypes || types;
       let i = 0;
-      if (!targetTypes.includes(targetType))
+      if (!types.includes(targetType))
         return console.error("Invalid target type", targetType);
-      const setter = eval(
-        `set${targetType[0].toUpperCase()}${targetType.slice(1)}Inventory`
-      );
-      setter((prev) => {
+      setInventory(targetType, (prev) => {
         const newInventory = [...prev];
         newInventory.forEach((slot, index) => {
           if (i >= itemArray.length) return;
@@ -110,12 +109,8 @@ const AppProvider = ({ children }) => {
         setMousePosition,
         isLeftDragging,
         setIsLeftDragging,
-        craftingTableInventory,
-        setCraftingTableInventory,
-        playerInventory,
-        setPlayerInventory,
-        chestInventory,
-        setChestInventory,
+        inventories,
+        setInventory,
         insertInventoryItem,
       }}
     >
