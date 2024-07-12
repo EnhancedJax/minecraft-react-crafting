@@ -5,14 +5,12 @@ import React, {
   useEffect,
   useState,
 } from "react";
-import getRanges from "../../utils/getRanges";
 import getTextures from "../../utils/getTextures";
 import {
   DEFAULT_STACK_SIZE,
   INVENTORY_COLS,
   INVENTORY_ROWS,
   MAX_STACK_SIZES,
-  STACK_16_RANGES,
 } from "./constants";
 
 // Create a new context
@@ -282,7 +280,7 @@ const InventoryProvider = ({ index, children }) => {
       const { items } = await getTextures();
 
       // console.log(getRanges(STACK_ONE_RANGES, items));
-      console.log(getRanges(STACK_16_RANGES, items));
+      // console.log(getRanges(STACK_16_RANGES, items));
 
       setItems(items);
     };
