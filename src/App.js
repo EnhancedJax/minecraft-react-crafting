@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import Pickup from "./components/Inventory/containers/Pickup";
 import InventoryGroup from "./components/InventoryGroup";
+import Scene from "./components/Steve3D";
 import { AppProvider } from "./provider";
 
 function App() {
@@ -11,18 +12,14 @@ function App() {
   }, []);
   return (
     <main className="flex w-screen h-screen overflow-hidden bg-neutral-600 flex-center">
-      {/* <img
-        src="inventory.png"
-        alt="background"
-        className="z-20"
-        style={{ height: 500 }}
-      /> */}
       <AppProvider>
         <div className="flex flex-col items-center gap-3 p-3 border-4 border-black rounded-xl bg-[#C6C6C6]">
           <div className="flex justify-between w-full">
             <div className="flex items-end h-full">
               <InventoryGroup type="armor" />
-              <div className="mc-grid !h-[216px] !w-[150px] !bg-black"></div>
+              <div className="mc-grid !h-[216px] !w-[150px] !bg-black">
+                <Scene />
+              </div>
               <div className="mc-grid "></div>
             </div>
             <div className="">
