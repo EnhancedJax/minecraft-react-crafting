@@ -1,8 +1,10 @@
 import { useState } from "react";
+import { useApp } from "../provider";
 import { useInventory } from "./Inventory/provider";
 
 export default function Chat() {
-  const { items, insertInventoryItem } = useInventory();
+  const { type, items } = useInventory();
+  const { insertInventoryItem } = useApp();
   const [inputValue, setInputValue] = useState("");
   const [error, setError] = useState(null);
 
@@ -25,14 +27,14 @@ export default function Chat() {
       } else {
         const itemIndex = items.findIndex((i) => i.id === item);
         setError(false);
-        insertInventoryItem([{ id: itemIndex, count: count }]);
+        insertInventoryItem([{ id: itemIndex, count: count }], type);
         setInputValue("");
       }
     }
   };
 
   return (
-    <div className="absolute bottom-0 left-0 w-screen p-2 text-xs text-white bg-black bg-opacity-50">
+    <div className="absolute bottom-0 left-0 w-screen p-2 text-lg text-white bg-black bg-opacity-50">
       <span className="mr-2">/give @s</span>
       <input
         className={`bg-transparent ${error ? "text-red-500" : "text-white"}`}

@@ -1,6 +1,7 @@
-export const INVENTORY_ROWS = 4;
-export const INVENTORY_COLS = 9;
 export const DEFAULT_STACK_SIZE = 64;
+export const EMPTY_ITEM = { id: null, count: 0 };
+export const EMPTY_INVENTORY = (rows, cols) =>
+  Array(rows * cols).fill(EMPTY_ITEM);
 
 // for manual generation
 export const STACK_ONE_RANGES = [

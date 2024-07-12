@@ -5,27 +5,29 @@ import React, {
   useEffect,
   useState,
 } from "react";
-import getTextures from "../../utils/getTextures";
-import {
-  DEFAULT_STACK_SIZE,
-  INVENTORY_COLS,
-  INVENTORY_ROWS,
-  MAX_STACK_SIZES,
-} from "./constants";
+import { useApp } from "../../provider";
+import { maxStackSize } from "../../utils";
+import { EMPTY_ITEM } from "./constants";
 
 // Create a new context
 const InventoryContext = createContext();
 const useInventory = () => useContext(InventoryContext);
 
 // Create a provider component
-const InventoryProvider = ({ index, children }) => {
-  const EMPTY_ITEM = { id: null, count: 0 };
-  const [items, setItems] = useState([]);
-  const [inventory, setInventory] = useState(
-    Array(INVENTORY_ROWS * INVENTORY_COLS).fill(EMPTY_ITEM)
-  );
-  const [heldItem, setHeldItem] = useState(EMPTY_ITEM);
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+const InventoryProvider = ({ type, children }) => {
+  const appContext = useApp();
+  const {
+    insertInventoryItem,
+    heldItem,
+    setHeldItem,
+    setMousePosition,
+    setIsLeftDragging,
+    clickReference,
+    setClickReference,
+  } = appContext;
+  const inventory = appContext[`${type}Inventory`];
+  const setInventory =
+    appContext[`set${type[0].toUpperCase()}${type.slice(1)}Inventory`];
   const [lastMouseDownSlotIndex, setLastMouseDownSlotIndex] =
     useState(undefined);
   const [checkDClickIndex, setCheckDClickIndex] = useState(undefined);
@@ -36,33 +38,10 @@ const InventoryProvider = ({ index, children }) => {
 
   /* ------------- Helpers ------------ */
 
-  const insertInventoryItem = (itemArray) => {
-    let i = 0;
-    setInventory((prev) => {
-      const newInventory = [...prev];
-      newInventory.forEach((slot, index) => {
-        if (i >= itemArray.length) return;
-        if (newInventory[index].id === null) {
-          newInventory[index] = itemArray[i];
-          i++;
-        }
-      });
-      return newInventory;
-    });
-  };
-
   const timeoutDClick = () => {
     setTimeout(() => {
       setCheckDClickIndex(undefined);
     }, 250);
-  };
-
-  const maxStackSize = (id) => {
-    const stackSize = DEFAULT_STACK_SIZE;
-    const maxStack = MAX_STACK_SIZES.find((stack) =>
-      stack.ranges.some((range) => id >= range[0] && id <= range[1])
-    );
-    return maxStack ? maxStack.size : stackSize;
   };
 
   const placeOneItem = (newInventory, newHeldItem, index) => {
@@ -95,7 +74,7 @@ const InventoryProvider = ({ index, children }) => {
   /* -------------- Logic ------------- */
 
   const handleDrag = (index, syncLastRightClick) => {
-    console.log("dragging over:", index);
+    console.debug("dragging over:", index);
     const isRightClick = isLastRightClick || syncLastRightClick;
     if (heldItem.id === null) return; // can't drag if there's no item held
     if (isRightClick) {
@@ -119,7 +98,7 @@ const InventoryProvider = ({ index, children }) => {
         newHeldItem,
         index
       );
-      // console.log(newHeldItem);
+      // console.debug(newHeldItem);
     } else {
       const distributedCount = Math.floor(
         newHeldItem.count / newDraggedSlots.length
@@ -137,7 +116,7 @@ const InventoryProvider = ({ index, children }) => {
 
   const handleFinishDrag = useCallback(
     (index) => {
-      console.log("drag finished at:", index);
+      console.debug("drag finished at:", index);
       setDraggedSlots([]);
       if (dragRemainder >= 0) {
         let newHeldItem = { ...heldItem };
@@ -153,15 +132,22 @@ const InventoryProvider = ({ index, children }) => {
     [dragRemainder]
   );
 
-  const handleSlotClick = (index, isRightClick = false) => {
-    console.log("Registering click on ", index, checkDClickIndex);
+  const handleSlotClick = (index, isRightClick = false, isShift = false) => {
+    console.debug("Registering click on ", index, checkDClickIndex);
 
     let newCheckDClickIndex = index;
     let newInventory = [...inventory];
     let newHeldItem = { ...heldItem };
-    const stackSize = maxStackSize(newHeldItem.id);
 
-    if (newHeldItem.id !== null) {
+    if (isShift) {
+      console.debug("shift click");
+      insertInventoryItem(
+        [newInventory[index]],
+        type === "player" ? "chest" : "player"
+      );
+      newInventory[index] = EMPTY_ITEM;
+    } else if (newHeldItem.id !== null) {
+      const stackSize = maxStackSize(newHeldItem.id);
       /* ------ Put down interaction ------ */
       if (!isRightClick) {
         // left click
@@ -186,7 +172,7 @@ const InventoryProvider = ({ index, children }) => {
           }
         } else {
           // double clicking: gathera all items of the same type, until reaching a stack or there are no items of the same type left.
-          console.log("double click");
+          console.debug("double click");
           for (let i = 0; i < newInventory.length; i++) {
             if (newInventory[i].id === newHeldItem.id) {
               if (newInventory[i].count + newHeldItem.count > stackSize) {
@@ -237,31 +223,39 @@ const InventoryProvider = ({ index, children }) => {
 
   const handleMouseDown = useCallback(
     (e, index) => {
-      const isRightClick = e.button === 2;
-      setMousePosition({ x: e.clientX, y: e.clientY });
-      setIsLastRightClick(isRightClick);
-      setIsDragging(true);
-      if (checkDClickIndex !== index) {
-        handleDrag(index, isRightClick);
+      if (!isDragging && !e.shiftKey) {
+        const isRightClick = e.button === 2;
+        setMousePosition({ x: e.clientX, y: e.clientY });
+        setIsLastRightClick(isRightClick);
+        setIsDragging(true);
+        if (checkDClickIndex !== index) {
+          handleDrag(index, isRightClick);
+        }
       }
       setLastMouseDownSlotIndex(index);
+      setClickReference(type);
     },
-    [handleDrag, checkDClickIndex]
+    [handleDrag, checkDClickIndex, isDragging]
   );
 
   const handleMouseUp = useCallback(
     (e, index) => {
-      if (index === null && e.target.id !== "slot") {
+      if (clickReference !== type) return;
+      if (
+        index === null &&
+        (e.target.classList[0] !== "mc-grid" ||
+          e.target.classList[1] !== `type-${type}`)
+      ) {
         // handle mouse up outside of the inventory
-        console.log("mouse up outside");
+        console.debug("mouse up outside");
         if (isDragging) handleFinishDrag(null);
         setIsDragging(false);
         return;
       }
-      console.log("mouse up", index);
+      console.debug("mouse up", index);
       setIsDragging(false);
       if (lastMouseDownSlotIndex === index && draggedSlots.length === 0) {
-        handleSlotClick(index, isLastRightClick);
+        handleSlotClick(index, isLastRightClick, e.shiftKey);
       }
       if (index !== null) {
         handleFinishDrag(index);
@@ -270,31 +264,16 @@ const InventoryProvider = ({ index, children }) => {
       }
       setIsLastRightClick(null);
     },
-    [isDragging, dragRemainder]
+    [
+      isDragging,
+      dragRemainder,
+      lastMouseDownSlotIndex,
+      handleSlotClick,
+      clickReference,
+    ]
   );
 
   /* ------------- effects ------------ */
-
-  useEffect(() => {
-    const fetchTextures = async () => {
-      const { items } = await getTextures();
-
-      // console.log(getRanges(STACK_ONE_RANGES, items));
-      // console.log(getRanges(STACK_16_RANGES, items));
-
-      setItems(items);
-    };
-
-    fetchTextures();
-
-    const handleMouseMove = (e) => {
-      setMousePosition({ x: e.clientX, y: e.clientY });
-    };
-    window.addEventListener("mousemove", handleMouseMove);
-    return () => {
-      window.removeEventListener("mousemove", handleMouseMove);
-    };
-  }, []);
 
   useEffect(() => {
     const eventHandler = (e) => {
@@ -308,20 +287,22 @@ const InventoryProvider = ({ index, children }) => {
     };
   }, [handleMouseUp]);
 
+  useEffect(() => {
+    setIsLeftDragging(isDragging ? (!isLastRightClick ? true : false) : false);
+  }, [isDragging, isLastRightClick]);
+
   return (
     <InventoryContext.Provider
       value={{
-        items,
+        type,
         inventory,
         heldItem,
-        mousePosition,
         draggedSlots,
         isLastRightClick,
         isDragging,
         handleMouseOver,
         handleMouseDown,
         handleMouseUp,
-        insertInventoryItem,
       }}
     >
       {children}
