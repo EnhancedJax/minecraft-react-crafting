@@ -5,8 +5,15 @@ import React, {
   useEffect,
   useState,
 } from "react";
+import getRanges from "../../utils/getRanges";
 import getTextures from "../../utils/getTextures";
-import { INVENTORY_COLS, INVENTORY_ROWS, MAX_STACK_SIZE } from "./constants";
+import {
+  DEFAULT_STACK_SIZE,
+  INVENTORY_COLS,
+  INVENTORY_ROWS,
+  MAX_STACK_SIZES,
+  STACK_16_RANGES,
+} from "./constants";
 
 // Create a new context
 const InventoryContext = createContext();
@@ -26,7 +33,7 @@ const InventoryProvider = ({ index, children }) => {
   const [checkDClickIndex, setCheckDClickIndex] = useState(undefined);
   const [isLastRightClick, setIsLastRightClick] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
-  const [draggedSlots, setDraggedSlots] = useState(new Set());
+  const [draggedSlots, setDraggedSlots] = useState([]);
   const [dragRemainder, setDragRemainder] = useState(-1);
 
   /* ------------- Helpers ------------ */
@@ -52,6 +59,14 @@ const InventoryProvider = ({ index, children }) => {
     }, 250);
   };
 
+  const maxStackSize = (id) => {
+    const stackSize = DEFAULT_STACK_SIZE;
+    const maxStack = MAX_STACK_SIZES.find((stack) =>
+      stack.ranges.some((range) => id >= range[0] && id <= range[1])
+    );
+    return maxStack ? maxStack.size : stackSize;
+  };
+
   const placeOneItem = (newInventory, newHeldItem, index) => {
     if (newInventory[index].id === null) {
       newInventory[index] = { id: newHeldItem.id, count: 1 };
@@ -63,7 +78,7 @@ const InventoryProvider = ({ index, children }) => {
     } else {
       if (newInventory[index].id === newHeldItem.id) {
         const totalCount = newInventory[index].count + 1;
-        if (totalCount <= MAX_STACK_SIZE) {
+        if (totalCount <= maxStackSize(newHeldItem.id)) {
           newInventory[index] = {
             id: newHeldItem.id,
             count: totalCount,
@@ -82,26 +97,25 @@ const InventoryProvider = ({ index, children }) => {
   /* -------------- Logic ------------- */
 
   const handleDrag = (index, syncLastRightClick) => {
-    console.log(
-      "dragging over:",
-      index,
-      heldItem,
-      isLastRightClick || syncLastRightClick
-    );
-    if (heldItem.id === null) return;
-    if (isLastRightClick || syncLastRightClick) {
+    console.log("dragging over:", index);
+    const isRightClick = isLastRightClick || syncLastRightClick;
+    if (heldItem.id === null) return; // can't drag if there's no item held
+    if (isRightClick) {
       if (
         ![null, heldItem.id].includes(inventory[index].id) ||
-        draggedSlots.has(index)
+        draggedSlots.includes(index)
       )
         return; // can't drag over an occupied slot unless it's the same item
     } else {
       if (inventory[index].id !== null) return; // can't drag over an occupied slot
     }
-    draggedSlots.add(index);
+
+    let newDraggedSlots = [...draggedSlots];
     let newInventory = [...inventory];
     let newHeldItem = { ...heldItem };
-    if (isLastRightClick || syncLastRightClick) {
+
+    newDraggedSlots.push(index);
+    if (isRightClick) {
       [newInventory, newHeldItem] = placeOneItem(
         newInventory,
         newHeldItem,
@@ -110,23 +124,23 @@ const InventoryProvider = ({ index, children }) => {
       // console.log(newHeldItem);
     } else {
       const distributedCount = Math.floor(
-        newHeldItem.count / draggedSlots.size
+        newHeldItem.count / newDraggedSlots.length
       );
       if (distributedCount < 1) return;
-      setDragRemainder(newHeldItem.count % draggedSlots.size);
-      draggedSlots.forEach((slot) => {
+      setDragRemainder(newHeldItem.count % newDraggedSlots.length);
+      newDraggedSlots.forEach((slot) => {
         newInventory[slot] = { id: newHeldItem.id, count: distributedCount };
       });
     }
     setInventory(newInventory);
     setHeldItem(newHeldItem);
+    setDraggedSlots(newDraggedSlots);
   };
 
   const handleFinishDrag = useCallback(
     (index) => {
       console.log("drag finished at:", index);
-      draggedSlots.clear();
-      // console.log(dragRemainder);
+      setDraggedSlots([]);
       if (dragRemainder >= 0) {
         let newHeldItem = { ...heldItem };
         if (dragRemainder === 0) {
@@ -147,6 +161,7 @@ const InventoryProvider = ({ index, children }) => {
     let newCheckDClickIndex = index;
     let newInventory = [...inventory];
     let newHeldItem = { ...heldItem };
+    const stackSize = maxStackSize(newHeldItem.id);
 
     if (newHeldItem.id !== null) {
       /* ------ Put down interaction ------ */
@@ -155,15 +170,15 @@ const InventoryProvider = ({ index, children }) => {
         if (checkDClickIndex !== index) {
           if (newInventory[index].id === newHeldItem.id) {
             const totalCount = newInventory[index].count + heldItem.count;
-            if (totalCount <= MAX_STACK_SIZE) {
+            if (totalCount <= stackSize) {
               newInventory[index] = { id: newHeldItem.id, count: totalCount };
               newHeldItem = EMPTY_ITEM;
             } else {
               newInventory[index] = {
                 id: newHeldItem.id,
-                count: MAX_STACK_SIZE,
+                count: stackSize,
               };
-              newHeldItem.count = totalCount - MAX_STACK_SIZE;
+              newHeldItem.count = totalCount - stackSize;
             }
           } else {
             // Swap items
@@ -176,9 +191,9 @@ const InventoryProvider = ({ index, children }) => {
           console.log("double click");
           for (let i = 0; i < newInventory.length; i++) {
             if (newInventory[i].id === newHeldItem.id) {
-              if (newInventory[i].count + newHeldItem.count > MAX_STACK_SIZE) {
-                newInventory[i].count -= MAX_STACK_SIZE - newHeldItem.count;
-                newHeldItem.count = MAX_STACK_SIZE;
+              if (newInventory[i].count + newHeldItem.count > stackSize) {
+                newInventory[i].count -= stackSize - newHeldItem.count;
+                newHeldItem.count = stackSize;
                 break;
               }
               newHeldItem.count += newInventory[i].count;
@@ -228,9 +243,7 @@ const InventoryProvider = ({ index, children }) => {
       setMousePosition({ x: e.clientX, y: e.clientY });
       setIsLastRightClick(isRightClick);
       setIsDragging(true);
-      if (checkDClickIndex === index) {
-        handleSlotClick(index, isRightClick);
-      } else {
+      if (checkDClickIndex !== index) {
         handleDrag(index, isRightClick);
       }
       setLastMouseDownSlotIndex(index);
@@ -249,13 +262,13 @@ const InventoryProvider = ({ index, children }) => {
       }
       console.log("mouse up", index);
       setIsDragging(false);
-      if (lastMouseDownSlotIndex === index && draggedSlots.size === 0) {
+      if (lastMouseDownSlotIndex === index && draggedSlots.length === 0) {
         handleSlotClick(index, isLastRightClick);
       }
       if (index !== null) {
         handleFinishDrag(index);
       } else {
-        draggedSlots.clear();
+        setDraggedSlots([]);
       }
       setIsLastRightClick(null);
     },
@@ -267,6 +280,10 @@ const InventoryProvider = ({ index, children }) => {
   useEffect(() => {
     const fetchTextures = async () => {
       const { items } = await getTextures();
+
+      // console.log(getRanges(STACK_ONE_RANGES, items));
+      console.log(getRanges(STACK_16_RANGES, items));
+
       setItems(items);
     };
 
@@ -301,6 +318,8 @@ const InventoryProvider = ({ index, children }) => {
         heldItem,
         mousePosition,
         draggedSlots,
+        isLastRightClick,
+        isDragging,
         handleMouseOver,
         handleMouseDown,
         handleMouseUp,

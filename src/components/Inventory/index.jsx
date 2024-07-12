@@ -8,6 +8,8 @@ export default function Inventory() {
     heldItem,
     mousePosition,
     draggedSlots,
+    isLastRightClick,
+    isDragging,
     handleMouseOver,
     handleMouseDown,
     handleMouseUp,
@@ -20,6 +22,9 @@ export default function Inventory() {
       { id: 104, count: 23 },
       { id: 0, count: 4 },
       { id: 739, count: 1 },
+      { id: 739, count: 1 },
+      { id: 739, count: 1 },
+      { id: 958, count: 10 },
     ]);
   }, []);
 
@@ -44,7 +49,7 @@ export default function Inventory() {
         <div
           key={slotIndex}
           className={`relative w-[36px] h-[36px] cursor-pointer mc-grid ${
-            draggedSlots.has(slotIndex) && id !== null && "opacity-50"
+            draggedSlots.includes(slotIndex) && id !== null && "opacity-50"
           }`}
           id="slot"
           onMouseOver={() => handleMouseOver(slotIndex)}
@@ -78,7 +83,17 @@ export default function Inventory() {
             alt={items[heldItem.id]?.readable}
             className="w-[36px] h-[36px] object-cover"
           />
-          <StackSizeNumber count={heldItem.count} />
+          <div
+            style={{
+              display: isDragging
+                ? !isLastRightClick
+                  ? "none"
+                  : "block"
+                : "block",
+            }}
+          >
+            <StackSizeNumber count={heldItem.count} />
+          </div>
         </div>
       )}
     </div>
