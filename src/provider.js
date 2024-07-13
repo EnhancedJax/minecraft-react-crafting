@@ -39,6 +39,7 @@ const AppProvider = ({ children }) => {
   const [isLeftDragging, setIsLeftDragging] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [clickReference, setClickReference] = useState(null);
+  const [showTooltip, setShowTooltip] = useState({ id: null, type: null });
 
   function setInventory(type, callback) {
     setInventories((prev) => {
@@ -97,6 +98,14 @@ const AppProvider = ({ children }) => {
     [types]
   );
 
+  const handleMouseEnter = useCallback((index, inventoryType) => {
+    setShowTooltip({ id: index, type: inventoryType });
+  }, []);
+
+  const handleMouseLeave = useCallback(() => {
+    setShowTooltip({ id: null, type: null });
+  }, []);
+
   return (
     <AppContext.Provider
       value={{
@@ -112,6 +121,9 @@ const AppProvider = ({ children }) => {
         inventories,
         setInventory,
         insertInventoryItem,
+        showTooltip,
+        handleMouseEnter,
+        handleMouseLeave,
       }}
     >
       {children}

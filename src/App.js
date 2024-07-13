@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import Pickup from "./components/Inventory/containers/Pickup";
 import InventoryGroup from "./components/InventoryGroup";
 import Scene from "./components/Steve3D";
+import Tooltip from "./components/Tooltip";
 import { AppProvider } from "./provider";
 
 function App() {
@@ -35,6 +36,7 @@ function App() {
           <InventoryGroup type="player" />
         </div>
         <Pickup />
+        <Tooltip />
       </AppProvider>
     </main>
   );

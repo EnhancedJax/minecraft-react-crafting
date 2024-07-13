@@ -12,7 +12,7 @@ export default function Inventory({ rows = 4, cols = 9 }) {
     handleMouseUp,
   } = useInventory();
 
-  const { items } = useApp();
+  const { items, handleMouseEnter, handleMouseLeave } = useApp();
 
   return (
     <div
@@ -31,6 +31,8 @@ export default function Inventory({ rows = 4, cols = 9 }) {
           onMouseOver={() => handleMouseOver(slotIndex)}
           onMouseDown={(e) => handleMouseDown(e, slotIndex)}
           onMouseUp={(e) => handleMouseUp(e, slotIndex)}
+          onMouseEnter={() => handleMouseEnter(slotIndex, type)}
+          onMouseLeave={() => handleMouseLeave()}
         >
           {id !== null && (
             <>
