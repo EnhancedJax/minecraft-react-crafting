@@ -34,12 +34,12 @@ export default function Chat() {
 
   const handleGiveCommand = (item, c) => {
     const count = c || 1;
-    const itemNotFound = !items.find((i) => i.id === item);
+    const itemIndex = items.findIndex((i) => i.name === item);
+    const itemNotFound = itemIndex === -1;
     const invalidCount = isNaN(count) || count < 1;
     if (itemNotFound || invalidCount) {
       setError("Not such item, or invalid count");
     } else {
-      const itemIndex = items.findIndex((i) => i.id === item);
       setError(null);
       insertInventoryItem([{ id: itemIndex, count: count }], type);
       setInputValue("");
@@ -63,7 +63,9 @@ export default function Chat() {
     <div className="absolute bottom-0 left-0 w-screen p-2 text-lg text-white bg-black bg-opacity-50">
       <span className="">/</span>
       <input
-        className={`bg-transparent ${error ? "text-red-300" : "text-white"}`}
+        className={`bg-transparent ${
+          error ? "text-red-300" : "text-white"
+        } w-max`}
         type="text"
         value={inputValue}
         onChange={handleInputChange}

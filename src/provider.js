@@ -100,7 +100,7 @@ const AppProvider = ({ children }) => {
         return newInventory;
       });
     },
-    [types]
+    [types, items]
   );
 
   const handleMouseEnter = useCallback(
