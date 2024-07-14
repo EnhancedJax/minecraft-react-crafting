@@ -73,7 +73,6 @@ const InventoryProvider = ({ type, children }) => {
   /* -------------- Logic ------------- */
 
   const handleDrag = (index, syncLastRightClick) => {
-    console.debug("dragging over:", index);
     const isRightClick = isLastRightClick || syncLastRightClick;
     if (heldItem.id === null) return; // can't drag if there's no item held
     if (isRightClick) {
@@ -97,7 +96,7 @@ const InventoryProvider = ({ type, children }) => {
         newHeldItem,
         index
       );
-      // console.debug(newHeldItem);
+      //
     } else {
       const distributedCount = Math.floor(
         newHeldItem.count / newDraggedSlots.length
@@ -115,7 +114,6 @@ const InventoryProvider = ({ type, children }) => {
 
   const handleFinishDrag = useCallback(
     (index) => {
-      console.debug("drag finished at:", index);
       setDraggedSlots([]);
       if (dragRemainder >= 0) {
         let newHeldItem = { ...heldItem };
@@ -132,14 +130,11 @@ const InventoryProvider = ({ type, children }) => {
   );
 
   const handleSlotClick = (index, isRightClick = false, isShift = false) => {
-    console.debug("Registering click on ", index, checkDClickIndex);
-
     let newCheckDClickIndex = index;
     let newInventory = [...inventory];
     let newHeldItem = { ...heldItem };
 
     if (isShift) {
-      console.debug("shift click");
       insertInventoryItem(
         [newInventory[index]],
         type === "hotbar" ? "inventory" : "hotbar"
@@ -171,7 +166,7 @@ const InventoryProvider = ({ type, children }) => {
           }
         } else {
           // double clicking: gathera all items of the same type, until reaching a stack or there are no items of the same type left.
-          console.debug("double click");
+
           for (let i = 0; i < newInventory.length; i++) {
             if (newInventory[i].id === newHeldItem.id) {
               if (newInventory[i].count + newHeldItem.count > stackSize) {
@@ -246,12 +241,12 @@ const InventoryProvider = ({ type, children }) => {
           e.target.classList[1] !== `type-${type}`)
       ) {
         // handle mouse up outside of the inventory
-        console.debug("mouse up outside");
+
         if (isDragging) handleFinishDrag(null);
         setIsDragging(false);
         return;
       }
-      console.debug("mouse up", index);
+
       setIsDragging(false);
       if (lastMouseDownSlotIndex === index && draggedSlots.length === 0) {
         handleSlotClick(index, isLastRightClick, e.shiftKey);

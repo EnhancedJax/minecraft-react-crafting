@@ -105,7 +105,7 @@ const AppProvider = ({ children }) => {
 
   const handleMouseEnter = useCallback(
     (index, inventoryType, itemID = null) => {
-      if (index === null) return;
+      if (index === null && itemID === null) return;
       const readable =
         items?.[
           itemID !== null ? itemID : inventories[inventoryType][index]?.id

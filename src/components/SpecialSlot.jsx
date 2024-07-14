@@ -24,12 +24,11 @@ export default function SpecialSlot({
         height: `${size}px`,
         padding: `${(size - 54) / 2}px`,
       }}
-      onClick={() => {
+      onClick={(e) => {
         if (heldItem.id === null) {
           setHeldItem(item);
           pickUpCallback();
         } else if (canPutDown(heldItem, item)) {
-          console.log(heldItem, item);
           setHeldItem(item);
           putDownCallback(heldItem);
         }

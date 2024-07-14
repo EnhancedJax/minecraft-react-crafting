@@ -1,3 +1,4 @@
+import CraftingResultSlot from "../CraftingResultSlot";
 import InventoryGroup from "../InventoryGroup";
 import Steve3D from "../Steve3D";
 
@@ -22,7 +23,10 @@ export default function Inventory() {
           <span className="text-2xl text-neutral-700">Crafting</span>
           <div className="flex items-center -mt-px">
             <InventoryGroup type="inventoryCrafting" />
-            <div className="ml-[60px] mc-grid mt-[6px]"></div>
+            <CraftingResultSlot
+              resultOfType="inventoryCrafting"
+              className="ml-[60px] mt-[6px]"
+            />
           </div>
         </div>
       </div>
