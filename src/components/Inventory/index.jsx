@@ -39,7 +39,7 @@ export default function Inventory({ rows = 4, cols = 9 }) {
               <img
                 src={items[id]?.texture}
                 alt={items[id]?.readable}
-                className="object-cover w-full h-full"
+                className="object-cover w-full h-full pixelated"
               />
               <StackSizeNumber count={count} />
             </>

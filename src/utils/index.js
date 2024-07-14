@@ -36,10 +36,8 @@ function getRanges(searchTerms, items) {
 }
 
 async function getTextures() {
-  const textures = await import(
-    "minecraft-textures/dist/textures/json/1.16.json"
-  );
-  return textures;
+  const items = await import("../assets/items.json");
+  return items;
 }
 
 function maxStackSize(id) {

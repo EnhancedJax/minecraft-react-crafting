@@ -18,7 +18,7 @@ export default function Pickup() {
           <img
             src={items[heldItem.id]?.texture}
             alt={items[heldItem.id]?.readable}
-            className="w-[54px] h-[54px] object-cover"
+            className="w-[54px] h-[54px] object-cover pixelated"
           />
           <div
             style={{

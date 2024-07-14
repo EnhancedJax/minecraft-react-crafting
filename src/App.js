@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import Pickup from "./components/Inventory/containers/Pickup";
 import InventoryGroup from "./components/InventoryGroup";
-import Scene from "./components/Steve3D";
+import Steve3D from "./components/Steve3D";
 import Tooltip from "./components/Tooltip";
 import { AppProvider } from "./provider";
 
@@ -19,7 +19,7 @@ function App() {
             <div className="flex items-end h-full">
               <InventoryGroup type="armor" />
               <div className="mc-grid !h-[216px] !w-[150px] !bg-black">
-                <Scene />
+                <Steve3D />
               </div>
               <div className="mc-grid "></div>
             </div>
