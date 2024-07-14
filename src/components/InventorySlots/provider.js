@@ -142,7 +142,7 @@ const InventoryProvider = ({ type, children }) => {
       console.debug("shift click");
       insertInventoryItem(
         [newInventory[index]],
-        type === "player" ? "chest" : "player"
+        type === "hotbar" ? "inventory" : "hotbar"
       );
       newInventory[index] = EMPTY_ITEM;
     } else if (newHeldItem.id !== null) {

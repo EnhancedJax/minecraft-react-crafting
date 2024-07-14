@@ -2,7 +2,7 @@ import { useApp } from "../../provider";
 import StackSizeNumber from "./containers/StackSizeNumber";
 import { useInventory } from "./provider";
 
-export default function Inventory({ rows = 4, cols = 9 }) {
+export default function InventorySlots({ rows = 4, cols = 9 }) {
   const {
     type,
     inventory,

@@ -1,13 +1,13 @@
 import { INVENTORIES } from "../constants";
 import Chat from "./Chat";
-import Inventory from "./Inventory";
-import { InventoryProvider } from "./Inventory/provider";
+import InventorySlots from "./InventorySlots";
+import { InventoryProvider } from "./InventorySlots/provider";
 
 export default function InventoryGroup({ type, size, chatTarget }) {
   return (
     <div className="w-min">
       <InventoryProvider type={type}>
-        <Inventory
+        <InventorySlots
           rows={INVENTORIES?.[type]?.rows || size[0]}
           cols={INVENTORIES?.[type]?.cols || size[1]}
         />

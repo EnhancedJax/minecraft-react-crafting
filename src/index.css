@@ -110,3 +110,56 @@ img {
 .pixelated {
   image-rendering: pixelated;
 }
+
+.mc-button {
+  display: inline-block;
+  position: relative;
+  padding: 16px 40px 24px 40px;
+  text-align: center;
+  color: #1c1d1f;
+  background-color: #d1d2d4;
+  border: 4px solid #1f1f1f;
+  border-bottom-width: 4px;
+  cursor: pointer;
+  font-size: 20px;
+
+  &::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 8px;
+    left: 0;
+    border: 4px solid #dfe0e2;
+  }
+
+  &::before {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 8px;
+    background-color: #58585a;
+  }
+}
+
+/* .mc-button:hover {
+  border-color: white; */
+/* } */
+
+.mc-button:active {
+  padding: 16px 40px;
+  background-color: #8d8d90;
+  margin-top: 8px;
+  /* border-color: #1f1f1f */
+
+  &::after {
+    bottom: 0px;
+    border-color: #97979a;
+  }
+
+  &::before {
+    height: 0px;
+  }
+}

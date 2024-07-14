@@ -1,7 +1,7 @@
 import {
   DEFAULT_STACK_SIZE,
   MAX_STACK_SIZES,
-} from "../components/Inventory/constants";
+} from "../components/InventorySlots/constants";
 
 function getRanges(searchTerms, items) {
   const matchingIndices = [];

@@ -6,7 +6,10 @@ import React, {
   useMemo,
   useState,
 } from "react";
-import { EMPTY_INVENTORY, EMPTY_ITEM } from "./components/Inventory/constants";
+import {
+  EMPTY_INVENTORY,
+  EMPTY_ITEM,
+} from "./components/InventorySlots/constants";
 import { INVENTORIES } from "./constants";
 import { getTextures, maxStackSize } from "./utils";
 
@@ -17,6 +20,7 @@ const useApp = () => useContext(AppContext);
 // Create a provider component
 const AppProvider = ({ children }) => {
   const types = useMemo(() => Object.keys(INVENTORIES), []);
+  const [screen, setScreen] = useState(0);
   const [inventories, setInventories] = useState(
     types.reduce((acc, type) => {
       const thisInventory = INVENTORIES[type];
@@ -39,7 +43,7 @@ const AppProvider = ({ children }) => {
   const [isLeftDragging, setIsLeftDragging] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [clickReference, setClickReference] = useState(null);
-  const [showTooltip, setShowTooltip] = useState({ id: null, type: null });
+  const [tooltip, setTooltip] = useState("");
   const [skin, setSkin] = useState("/Steve_64x64.png");
 
   function setInventory(type, callback) {
@@ -99,18 +103,28 @@ const AppProvider = ({ children }) => {
     [types]
   );
 
-  const handleMouseEnter = useCallback((index, inventoryType) => {
-    setShowTooltip({ id: index, type: inventoryType });
-  }, []);
+  const handleMouseEnter = useCallback(
+    (index, inventoryType, itemID = null) => {
+      if (index === null) return;
+      const readable =
+        items?.[
+          itemID !== null ? itemID : inventories[inventoryType][index]?.id
+        ]?.readable;
+      if (!heldItem.id && readable !== null) setTooltip(readable);
+    },
+    []
+  );
 
   const handleMouseLeave = useCallback(() => {
-    setShowTooltip({ id: null, type: null });
+    setTooltip("");
   }, []);
 
   return (
     <AppContext.Provider
       value={{
         items,
+        screen,
+        setScreen,
         heldItem,
         setHeldItem,
         clickReference,
@@ -122,7 +136,7 @@ const AppProvider = ({ children }) => {
         inventories,
         setInventory,
         insertInventoryItem,
-        showTooltip,
+        tooltip,
         handleMouseEnter,
         handleMouseLeave,
         skin,

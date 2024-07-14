@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useApp } from "../provider";
 import { getImageDimensions } from "../utils/chat";
-import { useInventory } from "./Inventory/provider";
+import { useInventory } from "./InventorySlots/provider";
 
 export default function Chat() {
   const { type } = useInventory();
