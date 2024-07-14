@@ -8,17 +8,12 @@ export default function Steve3D() {
   const cursorPosition = useRef({ x: 0, y: 0 });
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const thisRef = useRef();
-  const [rect, setRect] = useState(null);
-  useEffect(() => {
-    if (!thisRef.current) return;
-    setRect(thisRef.current.getBoundingClientRect());
-  }, [thisRef.current]);
 
   const handleMouseMove = (event) => {
     const { clientX, clientY } = event;
-    if (!rect) return;
-    const x = ((clientX + rect.left * 2) / window.innerWidth) * 2 - 1;
-    const y = -((clientY + rect.top / 2) / window.innerHeight) * 2 + 1;
+    const rect = thisRef.current.getBoundingClientRect();
+    const x = ((clientX - rect.left) / rect.width) * 2 - 1;
+    const y = -((clientY - rect.top) / rect.height) * 2 + 1;
     const newPosition = { x, y };
     cursorPosition.current = newPosition;
     setPosition(newPosition);
@@ -32,7 +27,7 @@ export default function Steve3D() {
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);
     };
-  }, [rect]);
+  }, []);
 
   return (
     <Canvas ref={thisRef}>
