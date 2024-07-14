@@ -40,6 +40,7 @@ const AppProvider = ({ children }) => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [clickReference, setClickReference] = useState(null);
   const [showTooltip, setShowTooltip] = useState({ id: null, type: null });
+  const [skin, setSkin] = useState("/Steve_64x64.png");
 
   function setInventory(type, callback) {
     setInventories((prev) => {
@@ -124,6 +125,8 @@ const AppProvider = ({ children }) => {
         showTooltip,
         handleMouseEnter,
         handleMouseLeave,
+        skin,
+        setSkin,
       }}
     >
       {children}

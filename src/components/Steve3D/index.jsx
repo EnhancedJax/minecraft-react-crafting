@@ -1,6 +1,7 @@
 import { Canvas, useLoader } from "@react-three/fiber";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useTransition } from "react";
 import * as THREE from "three";
+import { useApp } from "../../provider";
 import SteveBody from "./containers/SteveBody";
 import SteveHead from "./containers/SteveHead";
 
@@ -8,6 +9,9 @@ export default function Steve3D() {
   const cursorPosition = useRef({ x: 0, y: 0 });
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const thisRef = useRef();
+  const { skin } = useApp();
+  const [isPending, startTransition] = useTransition();
+  const [currentSkin, setCurrentSkin] = useState(skin);
 
   const handleMouseMove = (event) => {
     const { clientX, clientY } = event;
@@ -18,9 +22,8 @@ export default function Steve3D() {
     cursorPosition.current = newPosition;
     setPosition(newPosition);
   };
-  const texture = useLoader(THREE.TextureLoader, "/Steve_64x64.png");
-  texture.magFilter = THREE.NearestFilter;
-  texture.minFilter = THREE.NearestFilter;
+
+  const texture = useLoader(THREE.TextureLoader, currentSkin);
 
   useEffect(() => {
     window.addEventListener("mousemove", handleMouseMove);
@@ -29,11 +32,14 @@ export default function Steve3D() {
     };
   }, []);
 
+  useEffect(() => {
+    startTransition(() => {
+      setCurrentSkin(skin);
+    });
+  }, [skin]);
+
   return (
     <Canvas ref={thisRef}>
-      {/* <ambientLight intensity={0.2} /> */}
-      {/* <pointLight position={[10, 10, 10]} intensity={0.4} /> */}
-      {/* <Axes /> */}
       <SteveHead cursorPosition={position} texture={texture} />
       <SteveBody cursorPosition={position} texture={texture} />
     </Canvas>

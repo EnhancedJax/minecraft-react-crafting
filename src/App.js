@@ -12,7 +12,7 @@ function App() {
     });
   }, []);
   return (
-    <main className="flex w-screen h-screen overflow-hidden bg-neutral-600 flex-center">
+    <main className="flex w-screen h-screen overflow-hidden bg-neutral-800 flex-center">
       <AppProvider>
         <div className="flex flex-col items-center gap-3 p-3 border-4 border-black rounded-xl bg-[#C6C6C6]">
           <div className="flex justify-between w-full">
