@@ -11,7 +11,7 @@ import {
   EMPTY_ITEM,
 } from "./components/InventorySlots/constants";
 import { INVENTORIES } from "./constants";
-import { getTextures, maxStackSize } from "./utils";
+import { getTextures } from "./utils";
 
 // Create a new context
 const AppContext = createContext();
@@ -84,7 +84,7 @@ const AppProvider = ({ children }) => {
             newInventory[index] = itemArray[i];
             i++;
           } else {
-            const stackSize = maxStackSize(itemArray[i].id);
+            const stackSize = items[itemArray[i].id].stackSize;
             const spaceLeft = stackSize - slot.count;
             if (slot.id === itemArray[i].id) {
               if (spaceLeft >= itemArray[i].count) {
@@ -112,7 +112,7 @@ const AppProvider = ({ children }) => {
         ]?.readable;
       if (!heldItem.id && readable !== null) setTooltip(readable);
     },
-    []
+    [inventories, items, heldItem]
   );
 
   const handleMouseLeave = useCallback(() => {

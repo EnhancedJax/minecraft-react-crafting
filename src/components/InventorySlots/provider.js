@@ -6,7 +6,6 @@ import React, {
   useState,
 } from "react";
 import { useApp } from "../../provider";
-import { maxStackSize } from "../../utils";
 import { EMPTY_ITEM } from "./constants";
 
 // Create a new context
@@ -17,6 +16,7 @@ const useInventory = () => useContext(InventoryContext);
 const InventoryProvider = ({ type, children }) => {
   const appContext = useApp();
   const {
+    items,
     insertInventoryItem,
     heldItem,
     setHeldItem,
@@ -54,7 +54,7 @@ const InventoryProvider = ({ type, children }) => {
     } else {
       if (newInventory[index].id === newHeldItem.id) {
         const totalCount = newInventory[index].count + 1;
-        if (totalCount <= maxStackSize(newHeldItem.id)) {
+        if (totalCount <= items[newHeldItem.id].stackSize) {
           newInventory[index] = {
             id: newHeldItem.id,
             count: totalCount,
@@ -146,7 +146,7 @@ const InventoryProvider = ({ type, children }) => {
       );
       newInventory[index] = EMPTY_ITEM;
     } else if (newHeldItem.id !== null) {
-      const stackSize = maxStackSize(newHeldItem.id);
+      const stackSize = items[newHeldItem.id].stackSize;
       /* ------ Put down interaction ------ */
       if (!isRightClick) {
         // left click

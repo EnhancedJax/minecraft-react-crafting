@@ -1,8 +1,3 @@
-import {
-  DEFAULT_STACK_SIZE,
-  MAX_STACK_SIZES,
-} from "../components/InventorySlots/constants";
-
 function getRanges(searchTerms, items) {
   const matchingIndices = [];
 
@@ -40,12 +35,4 @@ async function getTextures() {
   return items;
 }
 
-function maxStackSize(id) {
-  const stackSize = DEFAULT_STACK_SIZE;
-  const maxStack = MAX_STACK_SIZES.find((stack) =>
-    stack.ranges.some((range) => id >= range[0] && id <= range[1])
-  );
-  return maxStack ? maxStack.size : stackSize;
-}
-
-export { getRanges, getTextures, maxStackSize };
+export { getRanges, getTextures };
