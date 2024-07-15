@@ -1,6 +1,6 @@
 {
-  "name": "speedcraft",
-  "version": "0.1.0",
+  "name": "minecraft-react-crafting",
+  "version": "1.0.0",
   "private": true,
   "dependencies": {
     "@react-three/drei": "^9.108.3",
