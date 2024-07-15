@@ -13,11 +13,16 @@ export default function Inventory() {
     >
       <div className="flex justify-between w-full">
         <div className="flex items-end h-full">
-          <InventoryGroup type="armor" />
+          <div className="flex flex-col">
+            <div className="mc-grid " />
+            <div className="mc-grid " />
+            <div className="mc-grid " />
+            <div className="mc-grid " />
+          </div>
           <div className="mc-grid !h-[216px] !w-[153px] !bg-black">
             <Steve3D />
           </div>
-          <div className="mc-grid "></div>
+          <div className="mc-grid " />
         </div>
         <div className="-mr-[6px]">
           <span className="text-2xl text-[#404040] ">Crafting</span>

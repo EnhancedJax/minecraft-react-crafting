@@ -1,17 +1,34 @@
 import CHEST_SOUND from "./assets/chest.mp3";
 import CLICK_SOUND from "./assets/click.mp3";
+import { EMPTY_ITEM } from "./components/InventorySlots/constants";
 import Chest from "./components/screens/Chest";
 import CraftingTable from "./components/screens/CraftingTable";
 import Inventory from "./components/screens/Inventory";
 
-export const PLAYER_DEFAULT_INVENTORY = [
-  { id: 775, count: 1 },
-  { id: 78, count: 1 },
-  { id: 115, count: 1 },
-  { id: 149, count: 1 },
+const PLAYER_DEFAULT_HOTBAR = [
+  { id: 795, count: 1 }, // axe
+  { id: 797, count: 1 }, // sword
+  { id: 1143, count: 1 }, // crossbow
+  EMPTY_ITEM,
+  EMPTY_ITEM,
+  { id: 844, count: 32 }, // golden apple
+  { id: 869, count: 1 }, // water
+  { id: 22, count: 64 }, // cobble
+  { id: 950, count: 48 }, // chicken
 ];
 
-export const CHEST_DEFAULT_INVENTORY = [
+const PLAYER_DEFAULT_INVENTORY = [
+  { id: 761, count: 64 }, // arrow
+  { id: 764, count: 12 }, // diamond
+  { id: 774, count: 44 }, // gold
+  { id: 1116, count: 1 }, // shield
+  { id: 23, count: 64 }, // planks
+  { id: 23, count: 64 }, // planks
+  { id: 23, count: 64 }, // planks
+  { id: 23, count: 64 }, // planks
+];
+
+const CHEST_DEFAULT_INVENTORY = [
   { id: 807, count: 32 },
   { id: 770, count: 32 },
   { id: 27, count: 32 },
@@ -26,6 +43,7 @@ export const INVENTORIES = {
   hotbar: {
     rows: 1,
     cols: 9,
+    defaultInventory: PLAYER_DEFAULT_HOTBAR,
   },
   inventory: {
     rows: 3,

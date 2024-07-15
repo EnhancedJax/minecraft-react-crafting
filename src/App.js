@@ -19,6 +19,10 @@ function App() {
             "url('https://staticg.sportskeeda.com/editor/2022/03/39c77-16481589742015-1920.jpg')",
         }}
       />
+      <span className="absolute text-xs text-pink-300 opacity-30 top-4">
+        Not affiliated with Mojang Studios, item textures are property of Mojang
+        Studios
+      </span>
       {/* <div className=""> */}
       <AppProvider>
         <Screens />

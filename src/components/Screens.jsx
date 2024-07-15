@@ -7,6 +7,7 @@ export default function Screens() {
   const handleClick = (index) => {
     SCREENS[index].sound.play();
     setScreen(index);
+    document.title = SCREENS[index].name;
   };
 
   return (
