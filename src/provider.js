@@ -45,6 +45,7 @@ const AppProvider = ({ children }) => {
   const [clickReference, setClickReference] = useState(null);
   const [tooltip, setTooltip] = useState("");
   const [skin, setSkin] = useState("/Steve_64x64.png");
+  const [lastHovered, setLastHovered] = useState({ type: null, id: null });
 
   function setInventory(type, callback) {
     setInventories((prev) => {
@@ -106,6 +107,7 @@ const AppProvider = ({ children }) => {
   const handleMouseEnter = useCallback(
     (index, inventoryType, itemID = null) => {
       if (index === null && itemID === null) return;
+      setLastHovered({ type: inventoryType, id: index });
       const readable =
         items?.[
           itemID !== null ? itemID : inventories[inventoryType][index]?.id
@@ -116,8 +118,38 @@ const AppProvider = ({ children }) => {
   );
 
   const handleMouseLeave = useCallback(() => {
+    setLastHovered({ type: null, id: null });
     setTooltip("");
   }, []);
+
+  const handleKeyDown = useCallback(
+    (key) => {
+      const numKey = Number(key) - 1;
+      if (lastHovered.id === null) return;
+      const { type, id } = lastHovered;
+      const item = inventories[type][id];
+      const hotbarItem = inventories["hotbar"][numKey];
+      const newInventories = { ...inventories };
+      // exchange items from hotbar slot to hovered slot
+      newInventories[type][id] = hotbarItem;
+      newInventories["hotbar"][numKey] = item;
+      setInventories(newInventories);
+      setTooltip("");
+    },
+    [lastHovered]
+  );
+
+  useEffect(() => {
+    const handler = (e) => {
+      if (e.key >= "0" && e.key <= "9") {
+        handleKeyDown(e.key);
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => {
+      window.removeEventListener("keydown", handler);
+    };
+  }, [handleKeyDown]);
 
   return (
     <AppContext.Provider
@@ -141,6 +173,7 @@ const AppProvider = ({ children }) => {
         handleMouseLeave,
         skin,
         setSkin,
+        setLastHovered,
       }}
     >
       {children}

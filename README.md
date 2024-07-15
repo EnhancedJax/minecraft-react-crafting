@@ -15,6 +15,7 @@ Minecraft inventory and crafting, the same experience but in your browser. Inven
 - Shift clicking (move items between inventories)
 - Shift get all craftables
 - Drag clicking (L: spread items, L: place one item)
+- Number keys to swap items from hotbar (0-9)
 - Commands (`/skin <name>` and `/give`)
 
 ## To-dos
