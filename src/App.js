@@ -11,12 +11,21 @@ function App() {
     });
   }, []);
   return (
-    <main className="flex w-screen h-screen gap-8 overflow-hidden bg-neutral-800 flex-center">
+    <main className="flex w-screen h-screen gap-8 overflow-hidden bg-black flex-center">
+      <div
+        className="absolute inset-0 bg-center bg-cover opacity-50 blur-xl "
+        style={{
+          backgroundImage:
+            "url('https://staticg.sportskeeda.com/editor/2022/03/39c77-16481589742015-1920.jpg')",
+        }}
+      />
+      {/* <div className=""> */}
       <AppProvider>
         <Screens />
         <Pickup />
         <Tooltip />
       </AppProvider>
+      {/* </div> */}
     </main>
   );
 }

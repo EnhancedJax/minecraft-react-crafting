@@ -13,6 +13,7 @@ export default function Inventory() {
       <div className="flex w-full my-[26px] ml-[132px] items-center">
         <InventoryGroup type="craftingTable" />
         <CraftingResultSlot
+          type="craftingTableResult"
           resultOfType="craftingTable"
           size={77}
           className="ml-[106px] mt-[2px] "

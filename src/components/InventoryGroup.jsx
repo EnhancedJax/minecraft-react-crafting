@@ -3,13 +3,26 @@ import Chat from "./Chat";
 import InventorySlots from "./InventorySlots";
 import { InventoryProvider } from "./InventorySlots/provider";
 
-export default function InventoryGroup({ type, size, chatTarget }) {
+export default function InventoryGroup({
+  type,
+  chatTarget,
+  pickUpCallback = () => {},
+  allowRightClickPickup = true,
+  canPutDown = () => true,
+  ...props
+}) {
   return (
     <div className="w-min">
-      <InventoryProvider type={type}>
+      <InventoryProvider
+        type={type}
+        pickUpCallback={pickUpCallback}
+        allowRightClickPickup={allowRightClickPickup}
+        canPutDown={canPutDown}
+      >
         <InventorySlots
-          rows={INVENTORIES?.[type]?.rows || size[0]}
-          cols={INVENTORIES?.[type]?.cols || size[1]}
+          {...props}
+          rows={INVENTORIES?.[type]?.rows}
+          cols={INVENTORIES?.[type]?.cols}
         />
         {chatTarget && <Chat />}
       </InventoryProvider>

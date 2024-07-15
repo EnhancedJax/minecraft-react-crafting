@@ -41,6 +41,7 @@ export default function Chat() {
       setError("Not such item, or invalid count");
     } else {
       setError(null);
+      console.log("Gave player item", itemIndex, count);
       insertInventoryItem([{ id: itemIndex, count: count }], type);
       setInputValue("");
     }

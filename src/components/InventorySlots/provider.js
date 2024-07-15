@@ -13,7 +13,13 @@ const InventoryContext = createContext();
 const useInventory = () => useContext(InventoryContext);
 
 // Create a provider component
-const InventoryProvider = ({ type, children }) => {
+const InventoryProvider = ({
+  type,
+  children,
+  pickUpCallback = () => {},
+  allowRightClickPickup = true,
+  canPutDown = () => true,
+}) => {
   const appContext = useApp();
   const {
     items,
@@ -25,6 +31,7 @@ const InventoryProvider = ({ type, children }) => {
     clickReference,
     setInventory,
     setClickReference,
+    handleMouseLeave,
   } = appContext;
   const inventory = appContext.inventories[type];
   const [lastMouseDownSlotIndex, setLastMouseDownSlotIndex] =
@@ -73,16 +80,18 @@ const InventoryProvider = ({ type, children }) => {
   /* -------------- Logic ------------- */
 
   const handleDrag = (index, syncLastRightClick) => {
+    const draggedItem = inventory[index];
+    if (!canPutDown(heldItem, draggedItem)) return;
     const isRightClick = isLastRightClick || syncLastRightClick;
     if (heldItem.id === null) return; // can't drag if there's no item held
     if (isRightClick) {
       if (
-        ![null, heldItem.id].includes(inventory[index].id) ||
+        ![null, heldItem.id].includes(draggedItem.id) ||
         draggedSlots.includes(index)
       )
         return; // can't drag over an occupied slot unless it's the same item
     } else {
-      if (inventory[index].id !== null) return; // can't drag over an occupied slot
+      if (draggedItem.id !== null) return; // can't drag over an occupied slot
     }
 
     let newDraggedSlots = [...draggedSlots];
@@ -133,73 +142,89 @@ const InventoryProvider = ({ type, children }) => {
     let newCheckDClickIndex = index;
     let newInventory = [...inventory];
     let newHeldItem = { ...heldItem };
+    const clickedItem = { ...newInventory[index] };
 
     if (isShift) {
+      if (clickedItem.id === null) return;
       insertInventoryItem(
-        [newInventory[index]],
+        [clickedItem],
         type === "hotbar" ? "inventory" : "hotbar"
       );
       newInventory[index] = EMPTY_ITEM;
+      pickUpCallback();
     } else if (newHeldItem.id !== null) {
-      const stackSize = items[newHeldItem.id].stackSize;
-      /* ------ Put down interaction ------ */
-      if (!isRightClick) {
-        // left click
-        if (checkDClickIndex !== index) {
-          if (newInventory[index].id === newHeldItem.id) {
-            const totalCount = newInventory[index].count + heldItem.count;
-            if (totalCount <= stackSize) {
-              newInventory[index] = { id: newHeldItem.id, count: totalCount };
-              newHeldItem = EMPTY_ITEM;
-            } else {
-              newInventory[index] = {
-                id: newHeldItem.id,
-                count: stackSize,
-              };
-              newHeldItem.count = totalCount - stackSize;
-            }
-          } else {
-            // Swap items
-            const temp = newInventory[index];
-            newInventory[index] = heldItem;
-            newHeldItem = temp.id !== null ? temp : EMPTY_ITEM;
+      if (!canPutDown(newHeldItem, clickedItem)) {
+        /* ---- Pick up if can't put down --- */
+        if (newHeldItem.id === clickedItem.id) {
+          const totalCount = clickedItem.count + heldItem.count;
+          const stackSize = items[newHeldItem.id].stackSize;
+          if (totalCount <= stackSize) {
+            newHeldItem.count = totalCount;
+            newInventory[index] = EMPTY_ITEM;
+            pickUpCallback();
           }
-        } else {
-          // double clicking: gathera all items of the same type, until reaching a stack or there are no items of the same type left.
-
-          for (let i = 0; i < newInventory.length; i++) {
-            if (newInventory[i].id === newHeldItem.id) {
-              if (newInventory[i].count + newHeldItem.count > stackSize) {
-                newInventory[i].count -= stackSize - newHeldItem.count;
-                newHeldItem.count = stackSize;
-                break;
-              }
-              newHeldItem.count += newInventory[i].count;
-              newInventory[i] = EMPTY_ITEM;
-            }
-          }
-          newCheckDClickIndex = undefined;
         }
       } else {
-        // right click: place one item
-        [newInventory, newHeldItem] = placeOneItem(
-          newInventory,
-          newHeldItem,
-          index
-        );
+        /* ------ Put down interaction ------ */
+        const stackSize = items[newHeldItem.id].stackSize;
+        if (!isRightClick) {
+          // left click
+          if (checkDClickIndex !== index) {
+            if (clickedItem.id === newHeldItem.id) {
+              const totalCount = clickedItem.count + heldItem.count;
+              if (totalCount <= stackSize) {
+                newInventory[index] = { id: newHeldItem.id, count: totalCount };
+                newHeldItem = EMPTY_ITEM;
+              } else {
+                newInventory[index] = {
+                  id: newHeldItem.id,
+                  count: stackSize,
+                };
+                newHeldItem.count = totalCount - stackSize;
+              }
+            } else {
+              // Swap items
+              const temp = clickedItem;
+              newInventory[index] = heldItem;
+              newHeldItem = temp.id !== null ? temp : EMPTY_ITEM;
+            }
+          } else {
+            // double clicking: gathera all items of the same type, until reaching a stack or there are no items of the same type left.
+
+            for (let i = 0; i < newInventory.length; i++) {
+              if (newInventory[i].id === newHeldItem.id) {
+                if (newInventory[i].count + newHeldItem.count > stackSize) {
+                  newInventory[i].count -= stackSize - newHeldItem.count;
+                  newHeldItem.count = stackSize;
+                  break;
+                }
+                newHeldItem.count += newInventory[i].count;
+                newInventory[i] = EMPTY_ITEM;
+              }
+            }
+            newCheckDClickIndex = undefined;
+          }
+        } else {
+          // right click: place one item
+          [newInventory, newHeldItem] = placeOneItem(
+            newInventory,
+            newHeldItem,
+            index
+          );
+        }
       }
     } else {
+      pickUpCallback();
       /* ------- Pick up interaction ------ */
-      if (isRightClick && newInventory[index].id !== null) {
-        const halfStack = Math.ceil(newInventory[index].count / 2);
-        newHeldItem = { id: newInventory[index].id, count: halfStack };
+      if (isRightClick && clickedItem.id !== null && allowRightClickPickup) {
+        const halfStack = Math.ceil(clickedItem.count / 2);
+        newHeldItem = { id: clickedItem.id, count: halfStack };
         newInventory[index].count -= halfStack;
         if (newInventory[index].count === 0) {
           newInventory[index] = EMPTY_ITEM;
         }
       } else {
-        newHeldItem =
-          newInventory[index].id !== null ? newInventory[index] : EMPTY_ITEM;
+        newHeldItem = clickedItem.id !== null ? clickedItem : EMPTY_ITEM;
         newInventory[index] = EMPTY_ITEM;
       }
     }
@@ -207,6 +232,7 @@ const InventoryProvider = ({ type, children }) => {
     timeoutDClick();
     setInventory(type, newInventory);
     setHeldItem(newHeldItem);
+    handleMouseLeave();
   };
 
   /* ------------ Handlers ------------ */

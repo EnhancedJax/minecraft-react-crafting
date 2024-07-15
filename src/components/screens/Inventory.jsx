@@ -24,6 +24,7 @@ export default function Inventory() {
           <div className="flex items-center -mt-px">
             <InventoryGroup type="inventoryCrafting" />
             <CraftingResultSlot
+              type="inventoryCraftingResult"
               resultOfType="inventoryCrafting"
               className="ml-[60px] mt-[6px]"
             />
