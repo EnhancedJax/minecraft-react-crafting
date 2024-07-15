@@ -5,8 +5,9 @@ import React, {
   useEffect,
   useState,
 } from "react";
+import { SCREENS } from "../../constants";
 import { useApp } from "../../provider";
-import { EMPTY_ITEM } from "./constants";
+import { EMPTY_ITEM, SHIFT_MOVE_TO } from "./constants";
 
 const InventoryContext = createContext();
 const useInventory = () => useContext(InventoryContext);
@@ -20,6 +21,7 @@ const InventoryProvider = ({
 }) => {
   const {
     items,
+    screen,
     insertInventoryItem,
     heldItem,
     setHeldItem,
@@ -99,10 +101,17 @@ const InventoryProvider = ({
           newHeldItem.count / newDraggedSlots.length
         );
         if (distributedCount < 1) return;
-        setDragRemainder(newHeldItem.count % newDraggedSlots.length);
+        let remainder = newHeldItem.count % newDraggedSlots.length;
         newDraggedSlots.forEach((slot, index) => {
           if (newDragStash[index] !== null) {
-            newInventory[slot].count = distributedCount + newDragStash[index];
+            const stackSize = items[newHeldItem.id].stackSize;
+            const totalCount = newDragStash[index] + distributedCount;
+            if (totalCount > stackSize) {
+              remainder += totalCount - stackSize;
+              newInventory[slot].count = stackSize;
+            } else {
+              newInventory[slot].count = totalCount;
+            }
           } else {
             newInventory[slot] = {
               id: newHeldItem.id,
@@ -110,6 +119,7 @@ const InventoryProvider = ({
             };
           }
         });
+        setDragRemainder(remainder);
         setDragStash(newDragStash);
       }
       setInventory(type, newInventory);
@@ -150,10 +160,10 @@ const InventoryProvider = ({
         if (clickedItem.id === null) return;
         insertInventoryItem(
           [clickedItem],
-          type === "hotbar" ? "inventory" : "hotbar"
+          SHIFT_MOVE_TO[type][SCREENS[screen].id]
         );
         newInventory[index] = EMPTY_ITEM;
-        pickUpCallback();
+        pickUpCallback(isShift);
       } else if (newHeldItem.id !== null) {
         if (!canPutDown(newHeldItem, clickedItem)) {
           if (newHeldItem.id === clickedItem.id) {
@@ -162,7 +172,7 @@ const InventoryProvider = ({
             if (totalCount <= stackSize) {
               newHeldItem.count = totalCount;
               newInventory[index] = EMPTY_ITEM;
-              pickUpCallback();
+              pickUpCallback(isShift);
             }
           }
         } else {
@@ -213,7 +223,7 @@ const InventoryProvider = ({
           }
         }
       } else {
-        pickUpCallback();
+        pickUpCallback(isShift);
         if (isRightClick && clickedItem.id !== null && allowRightClickPickup) {
           const halfStack = Math.ceil(clickedItem.count / 2);
           newHeldItem = { id: clickedItem.id, count: halfStack };

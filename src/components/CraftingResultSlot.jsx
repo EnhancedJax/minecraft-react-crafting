@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
+import { SCREENS } from "../constants";
 import { useApp } from "../provider";
 import { findMatchingRecipe } from "../utils/crafting";
 import InventoryGroup from "./InventoryGroup";
-import { EMPTY_ITEM } from "./InventorySlots/constants";
+import { EMPTY_ITEM, SHIFT_MOVE_TO } from "./InventorySlots/constants";
 
 export default function CraftingResultSlot({
   type,
@@ -10,7 +11,7 @@ export default function CraftingResultSlot({
   className,
   ...props
 }) {
-  const { inventories, setInventory } = useApp();
+  const { screen, inventories, setInventory, insertInventoryItem } = useApp();
   const [matchedRecipe, setMatchedRecipe] = useState(null);
 
   const craftingInventory = useMemo(
@@ -34,10 +35,13 @@ export default function CraftingResultSlot({
     setInventory(type, [newResultItem]);
   }, [craftingInventory, craftingSize]);
 
-  const pickUpCallback = () => {
-    setInventory(resultOfType, (prevInventory) => {
+  const pickUpCallback = (isShift) => {
+    while (true) {
+      let newInventory = [...inventories[resultOfType]];
+      const currentCraftingInventoryID = inventories[resultOfType].map(
+        (item) => item.id
+      );
       const recipeType = matchedRecipe.ingredients ? "ingredients" : "inShape";
-      const newInventory = [...prevInventory];
       let i = 0;
       matchedRecipe[recipeType].flat().forEach((id) => {
         const index =
@@ -48,8 +52,21 @@ export default function CraftingResultSlot({
         }
         i = index + 1;
       });
-      return newInventory;
-    });
+      setInventory(resultOfType, newInventory);
+      if (!isShift) break;
+      if (
+        newInventory
+          .map((item) => item.id)
+          .every((id, index) => id === currentCraftingInventoryID[index])
+      ) {
+        insertInventoryItem(
+          [{ ...matchedRecipe.result }],
+          SHIFT_MOVE_TO[type][SCREENS[screen].id]
+        );
+      } else {
+        break;
+      }
+    }
     setMatchedRecipe(null);
   };
 

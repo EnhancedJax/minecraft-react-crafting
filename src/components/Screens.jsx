@@ -3,6 +3,12 @@ import { useApp } from "../provider";
 
 export default function Screens() {
   const { screen, setScreen } = useApp();
+
+  const handleClick = (index) => {
+    SCREENS[index].sound.play();
+    setScreen(index);
+  };
+
   return (
     <>
       {SCREENS[screen].component}
@@ -11,7 +17,9 @@ export default function Screens() {
           <button
             key={thisScreen.name}
             className="mc-button"
-            onClick={() => setScreen(index)}
+            onClick={() => {
+              handleClick(index);
+            }}
           >
             {thisScreen.name}
           </button>

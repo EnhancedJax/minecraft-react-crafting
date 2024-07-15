@@ -1,3 +1,5 @@
+import CHEST_SOUND from "./assets/chest.mp3";
+import CLICK_SOUND from "./assets/click.mp3";
 import Chest from "./components/screens/Chest";
 import CraftingTable from "./components/screens/CraftingTable";
 import Inventory from "./components/screens/Inventory";
@@ -58,15 +60,18 @@ export const SCREENS = [
     id: "inventory",
     name: "Inventory",
     component: <Inventory />,
+    sound: new Audio(CLICK_SOUND),
   },
   {
     id: "craftingTable",
     name: "Crafting Table",
     component: <CraftingTable />,
+    sound: new Audio(CLICK_SOUND),
   },
   {
     id: "chest",
     name: "Chest",
     component: <Chest />,
+    sound: new Audio(CHEST_SOUND),
   },
 ];

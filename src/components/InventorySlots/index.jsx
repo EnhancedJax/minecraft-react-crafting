@@ -30,7 +30,7 @@ export default function InventorySlots({
     >
       {inventory?.map(({ id, count }, slotIndex) => (
         <div
-          key={slotIndex}
+          key={`${type}-${slotIndex}`}
           className={`mc-grid type-${type} relative ${
             draggedSlots.includes(slotIndex) && id !== null && "opacity-50"
           }`} // position of class name mc-grid and type used for quick access. Don't change
