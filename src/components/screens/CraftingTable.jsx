@@ -10,7 +10,15 @@ export default function Inventory() {
         backgroundSize: "contain",
       }}
     >
-      <div className="flex w-full my-[26px] ml-[132px] items-center">
+      <div
+        className="h-[14px] text-left w-full ml-[132px] text-[#404040] text-xl"
+        style={{
+          transform: "translateY(-5px)",
+        }}
+      >
+        Crafting
+      </div>
+      <div className="flex w-full ml-[132px] items-center">
         <InventoryGroup type="craftingTable" />
         <CraftingResultSlot
           type="craftingTableResult"
@@ -18,6 +26,15 @@ export default function Inventory() {
           size={77}
           className="ml-[106px] mt-[2px] "
         />
+      </div>
+
+      <div
+        className="h-[14px] text-left w-full text-[#404040] text-xl"
+        style={{
+          transform: "translateY(-5px)",
+        }}
+      >
+        Inventory
       </div>
       <InventoryGroup type="inventory" chatTarget />
       <InventoryGroup type="hotbar" />

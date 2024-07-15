@@ -20,7 +20,7 @@ export default function Inventory() {
           <div className="mc-grid "></div>
         </div>
         <div className="-mr-[6px]">
-          <span className="text-2xl text-neutral-700">Crafting</span>
+          <span className="text-2xl text-[#404040] ">Crafting</span>
           <div className="flex items-center -mt-px">
             <InventoryGroup type="inventoryCrafting" />
             <CraftingResultSlot
