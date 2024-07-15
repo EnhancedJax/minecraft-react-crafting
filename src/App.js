@@ -11,7 +11,7 @@ function App() {
     });
   }, []);
   return (
-    <main className="flex w-screen h-screen gap-8 overflow-hidden bg-black flex-center">
+    <main className="flex w-screen h-screen gap-8 overflow-hidden bg-black flex-center sm:flex-col">
       <div
         className="absolute inset-0 bg-center bg-cover opacity-50 blur-xl "
         style={{
@@ -23,13 +23,11 @@ function App() {
         Not affiliated with Mojang Studios, item textures are property of Mojang
         Studios
       </span>
-      {/* <div className=""> */}
       <AppProvider>
         <Screens />
         <Pickup />
         <Tooltip />
       </AppProvider>
-      {/* </div> */}
     </main>
   );
 }
