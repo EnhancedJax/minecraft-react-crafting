@@ -1,4 +1,4 @@
-# Minecraft react crafting
+# <img src="./public/favicon.ico" width="32" height="32"> Minecraft react crafting
 
 ![screenshot](./screenshot.jpg)
 
