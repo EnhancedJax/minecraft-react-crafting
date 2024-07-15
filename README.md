@@ -1,6 +1,6 @@
 # Minecraft react crafting
 
-![screenshot](./src/screenshot.png)
+![screenshot](./screenshot.jpg)
 
 Minecraft inventory and crafting, the same experience but in your browser. Inventory tricks works too. Made with React.
 
