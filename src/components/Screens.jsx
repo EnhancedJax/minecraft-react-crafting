@@ -25,6 +25,19 @@ export default function Screens() {
             {thisScreen.name}
           </button>
         ))}
+        <div className="flex">
+          <button
+            className="mc-button mc-button-icon"
+            onClick={() =>
+              window.open(
+                "https://github.com/EnhancedJax/minecraft-react-crafting",
+                "_blank"
+              )
+            }
+          >
+            <img src="github.png" className="w-8 h-8 invert" />
+          </button>
+        </div>
       </div>
     </>
   );
