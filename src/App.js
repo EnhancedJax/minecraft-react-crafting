@@ -19,6 +19,7 @@ function App() {
         window.innerWidth < window.innerHeight && window.innerWidth < 1024
       );
     };
+    handleOrientationChange();
 
     // Add the event listener for orientation change
     window.addEventListener("resize", handleOrientationChange);
