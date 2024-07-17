@@ -61,7 +61,7 @@ export default function Chat() {
   };
 
   return (
-    <div className="absolute bottom-0 left-0 w-screen p-2 text-lg text-white bg-black bg-opacity-50">
+    <div className="absolute bottom-0 left-0 w-screen p-2 text-lg text-white bg-black bg-opacity-50 xl:hidden">
       <span className="">/</span>
       <input
         className={`bg-transparent ${
